@@ -10,7 +10,6 @@ CREATE TABLE users (
 
 ALTER TABLE users
 ADD COLUMN login_attempts INT DEFAULT 0,
-ADD COLUMN lockout_until DATETIME DEFAULT NULL;
 
 ALTER TABLE users
 ADD COLUMN access_code VARCHAR(4);
