@@ -17,7 +17,7 @@ ADD COLUMN access_code VARCHAR(4);
 ALTER TABLE users ADD COLUMN role VARCHAR(10);
 
 ALTER TABLE users ADD COLUMN status VARCHAR(10) DEFAULT 'Pending';
-INSERT INTO users (username, password, role, status) VALUES ('admin', 'admin', 'admin','active');
+INSERT INTO users (username, password, role, status) VALUES ('admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', 'admin','active');
 
 CREATE TABLE action_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
