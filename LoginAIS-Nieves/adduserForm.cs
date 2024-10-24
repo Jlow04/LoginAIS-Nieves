@@ -15,6 +15,9 @@ namespace LoginAIS_Nieves
     public partial class adduserForm : Form
     {
         dbconnect db = new dbconnect();
+        // Inside adduserForm class
+        public string Username { get; private set; }  // Expose Username as a public property
+
         public adduserForm()
         {
             InitializeComponent();
@@ -115,15 +118,13 @@ namespace LoginAIS_Nieves
 
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
+            
         }
 
         private void btncancel_Click_1(object sender, EventArgs e)
-        {
-            AdminForm adminF = new AdminForm();
+        { 
             this.Hide();
-            adminF.ShowDialog();
+            
         }
     }
 }

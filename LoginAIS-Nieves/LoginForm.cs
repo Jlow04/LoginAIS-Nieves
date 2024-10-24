@@ -19,12 +19,7 @@ namespace LoginAIS_Nieves
         // Dictionary to store failed login attempts per user
         private Dictionary<string, int> loginAttempts = new Dictionary<string, int>();
 
-        // Dictionary to store lockout expiration time per user
-        private Dictionary<string, DateTime> lockoutEndTime = new Dictionary<string, DateTime>();
-
-        // Timer to check lockout expiration (optional)
-        private Timer lockoutTimer;
-
+ 
         public LoginForm()
         {
             InitializeComponent();
@@ -41,32 +36,28 @@ namespace LoginAIS_Nieves
             if (userTable.Rows.Count == 0)
             {
                 MessageBox.Show("Username not found!", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                db.LogAction(username, "Login Attempt", "Failed - Username not found");
                 return;
             }
 
 
-            // Get login attempt and lockout information
+            // Get login attempt
             DataRow user = userTable.Rows[0];
             int loginAttempts = Convert.ToInt32(user["login_attempts"]);
-            DateTime? lockoutUntil = user.IsNull("lockout_until") ? (DateTime?)null : Convert.ToDateTime(user["lockout_until"]);
             string status = user["status"].ToString();
-
-            // Check if the account is locked
-            if (lockoutUntil.HasValue && lockoutUntil > DateTime.Now)
-            {
-                MessageBox.Show($"Account is locked until {lockoutUntil}. Please try again later.", "Account Locked", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
+  
 
             // Check the user's status
             if (status == "Pending")
             {
                 MessageBox.Show("Your account is pending approval by the admin.", "Account Pending", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                db.LogAction(username, "Login Attempt", "Failed - Account pending approval");
                 return;
             }
             else if (status == "Inactive")
             {
                 MessageBox.Show("Your account is inactive. Please contact the admin.", "Account Inactive", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                db.LogAction(username, "Login Attempt", "Failed - Account inactive");
                 return;
             }
 
@@ -77,11 +68,13 @@ namespace LoginAIS_Nieves
                 string role = user["role"].ToString();
 
                 // Successful login: Reset login attempts and lockout information
-                db.UpdateLoginAttempts(username, loginAttempts, null); // Reset attempts and lockout time
+                db.UpdateLoginAttempts(username, 0); // Reset attempts 
+
+                db.LogAction(username, "Login Attempt", "Successful");
 
                 if (role == "admin")
                 {
-                    AdminForm adminForm = new AdminForm();
+                    AdminForm adminForm = new AdminForm(username);
                     adminForm.Show();
                 }
                 else if (role == "user")
@@ -94,58 +87,46 @@ namespace LoginAIS_Nieves
             }
             else
             {
-                // Handle failed login attempts
                 loginAttempts++;
 
                 if (loginAttempts >= maxAttempts)
                 {
-                    // Lock the account for 1 minute
-                    DateTime lockoutUntilTime = DateTime.Now.AddMinutes(1);
-                    db.UpdateLoginAttempts(username, loginAttempts, lockoutUntilTime);
-
-                    MessageBox.Show($"Too many failed login attempts. Your account is locked for 1 minute.", "Account Locked", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    // Mark the account as inactive
+                    db.UpdateUserStatus(Convert.ToInt32(user["id"]), "Inactive");
+                    db.UpdateLoginAttempts(username, loginAttempts);
+                    MessageBox.Show("Too many failed login attempts. Your account has been deactivated. Please contact the admin to regain access.", "Account Deactivated", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    db.LogAction(username, "Login Attempt", "Failed - Account inactive due to too many failed attempts");
                 }
+
                 else
                 {
-                    // Update login attempts without locking the account
-                    db.UpdateLoginAttempts(username, loginAttempts, null);
+                    // Update login attempts without deactivating the account
+                    db.UpdateLoginAttempts(username, loginAttempts);
                     MessageBox.Show($"Invalid Username, Password or Access Code! {maxAttempts - loginAttempts} attempts remaining.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                     db.LogAction(username, "Login Attempt", "Failed - Invalid credentials");
                 }
             }
         }
 
-            // Method to authenticate user with username, password, and access code
-            private bool AuthenticateUser(string username, string password, string accessCode)
+        // Method to authenticate user with username, password, and access code
+        private bool AuthenticateUser(string username, string password, string accessCode)
         {
             DataTable dt = db.Login();  // Fetch users from the database
 
-            if (username == "admin" && password == "admin")
+            foreach (DataRow row in dt.Rows)
             {
-                foreach (DataRow row in dt.Rows)
-                {
-                    if (row["username"].ToString() == username && row["password"].ToString() == password && row["access_code"].ToString() == accessCode)
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            else
-            {
-                foreach (DataRow row in dt.Rows)
-                {
-                    string encryptedPassword = EncryptionHelper.HashPassword(password);
+                string encryptedPassword = EncryptionHelper.HashPassword(password);
 
-                    // Check if the username, hashed password, and access code match
-                    if (row["username"].ToString() == username && row["password"].ToString() == encryptedPassword && row["access_code"].ToString() == accessCode)
-                    {
-                        return true;
-                    }
+                // Check if the username, hashed password, and access code match
+                if (row["username"].ToString() == username && row["password"].ToString() == encryptedPassword && row["access_code"].ToString() == accessCode)
+                {
+                    // Successful authentication
+                    return true;
                 }
-
-                return false;
             }
 
+            // If no match is found, return false
+            return false;
         }
 
         private bool isPasswordVisible = false;

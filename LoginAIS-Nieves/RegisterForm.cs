@@ -49,6 +49,7 @@ namespace LoginAIS_Nieves
             if (IsUsernameTaken(username))
             {
                 MessageBox.Show("Username is already taken", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                db.LogAction(username, "Register", $"Registration attempt failed: Username '{username}' is already taken."); // Log the action
                 return;
             }
 
@@ -56,13 +57,14 @@ namespace LoginAIS_Nieves
             if (passwordStrength != "Strong")
             {
                 MessageBox.Show("Password is too weak! Please make sure it is strong.", "Weak Password", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                db.LogAction(username, "Register", $"Registration attempt failed: Password for '{username}' is weak."); // Log the action
                 return;
             }
 
             
             // Register the user using the provided method
             RegisterNewUser(username, password);
-   
+            
 
         }
 
@@ -115,6 +117,7 @@ namespace LoginAIS_Nieves
                 db.CloseDB();
 
                 MessageBox.Show("Registration successful!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                db.LogAction(username, "Register", $"User '{username}' registered successfully."); // Log successful registration
 
                 // Close the registration form and go back to the login form
                 this.Hide();

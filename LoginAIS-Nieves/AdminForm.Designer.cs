@@ -39,6 +39,7 @@
             this.btnSearch = new System.Windows.Forms.Button();
             this.btnstatus = new System.Windows.Forms.Button();
             this.btnadd = new System.Windows.Forms.Button();
+            this.btnrole = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.DGVusers)).BeginInit();
             this.SuspendLayout();
             // 
@@ -65,7 +66,7 @@
             this.DGVusers.ShowCellToolTips = false;
             this.DGVusers.ShowEditingIcon = false;
             this.DGVusers.ShowRowErrors = false;
-            this.DGVusers.Size = new System.Drawing.Size(363, 350);
+            this.DGVusers.Size = new System.Drawing.Size(502, 350);
             this.DGVusers.TabIndex = 0;
             // 
             // btrefresh
@@ -80,7 +81,7 @@
             // 
             // btdelete
             // 
-            this.btdelete.Location = new System.Drawing.Point(244, 406);
+            this.btdelete.Location = new System.Drawing.Point(201, 406);
             this.btdelete.Name = "btdelete";
             this.btdelete.Size = new System.Drawing.Size(49, 23);
             this.btdelete.TabIndex = 2;
@@ -102,7 +103,7 @@
             // 
             this.lbACP.AutoSize = true;
             this.lbACP.Font = new System.Drawing.Font("Microsoft Sans Serif", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lbACP.Location = new System.Drawing.Point(91, 9);
+            this.lbACP.Location = new System.Drawing.Point(17, 9);
             this.lbACP.Name = "lbACP";
             this.lbACP.Size = new System.Drawing.Size(202, 24);
             this.lbACP.TabIndex = 4;
@@ -110,7 +111,7 @@
             // 
             // btresetattempt
             // 
-            this.btresetattempt.Location = new System.Drawing.Point(184, 406);
+            this.btresetattempt.Location = new System.Drawing.Point(256, 406);
             this.btresetattempt.Name = "btresetattempt";
             this.btresetattempt.Size = new System.Drawing.Size(54, 23);
             this.btresetattempt.TabIndex = 5;
@@ -120,7 +121,7 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(218, 451);
+            this.button1.Location = new System.Drawing.Point(448, 9);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 6;
@@ -147,7 +148,7 @@
             // 
             // btnstatus
             // 
-            this.btnstatus.Location = new System.Drawing.Point(308, 406);
+            this.btnstatus.Location = new System.Drawing.Point(338, 406);
             this.btnstatus.Name = "btnstatus";
             this.btnstatus.Size = new System.Drawing.Size(53, 23);
             this.btnstatus.TabIndex = 9;
@@ -165,11 +166,22 @@
             this.btnadd.UseVisualStyleBackColor = true;
             this.btnadd.Click += new System.EventHandler(this.btnadd_Click);
             // 
+            // btnrole
+            // 
+            this.btnrole.Location = new System.Drawing.Point(397, 406);
+            this.btnrole.Name = "btnrole";
+            this.btnrole.Size = new System.Drawing.Size(50, 23);
+            this.btnrole.TabIndex = 11;
+            this.btnrole.Text = "Role";
+            this.btnrole.UseVisualStyleBackColor = true;
+            this.btnrole.Click += new System.EventHandler(this.btnrole_Click);
+            // 
             // AdminForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(405, 486);
+            this.ClientSize = new System.Drawing.Size(544, 486);
+            this.Controls.Add(this.btnrole);
             this.Controls.Add(this.btnadd);
             this.Controls.Add(this.btnstatus);
             this.Controls.Add(this.btnSearch);
@@ -202,5 +214,6 @@
         private System.Windows.Forms.Button btnSearch;
         private System.Windows.Forms.Button btnstatus;
         private System.Windows.Forms.Button btnadd;
+        private System.Windows.Forms.Button btnrole;
     }
 }

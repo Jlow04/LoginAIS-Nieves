@@ -27,11 +27,13 @@ namespace LoginAIS_Nieves
             newAccessCode = GenerateAccessCode();
             tbcode.Text = newAccessCode;
             db.UpdateAccessCode(username, newAccessCode); // Update in database
+            db.LogAction(username, "Generate New Access Code", $"User '{username}' generated a new access code: {newAccessCode}.");
         }
         private string GenerateAccessCode()
         {
             Random rnd = new Random();
             return rnd.Next(1000, 9999).ToString(); // Generates a 4-digit random number
+
         }
 
         private void btnlogout_Click(object sender, EventArgs e)
@@ -42,6 +44,8 @@ namespace LoginAIS_Nieves
             }
             else
             {
+                // Log the action
+                db.LogAction(username, "Logout", $"User '{username}' logged out.");
                 LoginForm loginForm = new LoginForm();
                 loginForm.Show();
                 this.Close();

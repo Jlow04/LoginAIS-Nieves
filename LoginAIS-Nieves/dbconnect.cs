@@ -62,7 +62,7 @@ namespace LoginAIS_Nieves
         public DataTable GetUsers()
         {
             OpenDB();
-            string sql = "SELECT id, username, password, login_attempts, lockout_until, access_code, status FROM users";
+            string sql = "SELECT id, username, password, login_attempts, access_code, status, role FROM users";
             DataTable dt = new DataTable();
             MySqlCommand cmd = new MySqlCommand(sql, connection);
             MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
@@ -97,15 +97,14 @@ namespace LoginAIS_Nieves
             return dataTable;
         }
 
-        public void UpdateLoginAttempts(string username, int attempts, DateTime? lockoutUntil)
+        public void UpdateLoginAttempts(string username, int attempts)
         {
             try
             {
                 OpenDB();
-                string query = "UPDATE users SET login_attempts = @attempts, lockout_until = @lockoutUntil WHERE username = @username";
+                string query = "UPDATE users SET login_attempts = @attempts WHERE username = @username";
                 MySqlCommand command = new MySqlCommand(query, connection);
                 command.Parameters.AddWithValue("@attempts", attempts);
-                command.Parameters.AddWithValue("@lockoutUntil", lockoutUntil.HasValue ? (object)lockoutUntil.Value : DBNull.Value);
                 command.Parameters.AddWithValue("@username", username);
 
                 command.ExecuteNonQuery();
@@ -200,5 +199,52 @@ namespace LoginAIS_Nieves
                 CloseDB();
             }
         }
+
+        //  db.UpdateUserRole(id, newRole);
+        public void UpdateUserRole(int id, string newRole)
+        {
+            try
+            {
+                OpenDB();
+                string query = "UPDATE users SET role = @role WHERE id = @id";
+                MySqlCommand command = new MySqlCommand(query, connection);
+                command.Parameters.AddWithValue("@role", newRole);
+                command.Parameters.AddWithValue("@id", id);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                CloseDB();
+            }
+        }
+
+        public void LogAction(string username, string action, string details)
+        {
+            try
+            {
+                OpenDB();
+                string query = "INSERT INTO action_logs (username, action, details, timestamp) VALUES (@username, @action, @details, @timestamp)";
+                MySqlCommand command = new MySqlCommand(query, connection);
+                command.Parameters.AddWithValue("@username", username);
+                command.Parameters.AddWithValue("@action", action);
+                command.Parameters.AddWithValue("@details", details);
+                command.Parameters.AddWithValue("@timestamp", DateTime.Now);
+                command.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                CloseDB();
+            }
+        }
+
+
     }
 }
