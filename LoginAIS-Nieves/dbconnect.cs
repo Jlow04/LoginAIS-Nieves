@@ -62,7 +62,7 @@ namespace LoginAIS_Nieves
         public DataTable GetUsers()
         {
             OpenDB();
-            string sql = "SELECT id, username, password, login_attempts, access_code, status, role FROM users";
+            string sql = "SELECT id, username, password, login_attempts, access_code, status, role, idle_timeout FROM users";
             DataTable dt = new DataTable();
             MySqlCommand cmd = new MySqlCommand(sql, connection);
             MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
@@ -245,6 +245,103 @@ namespace LoginAIS_Nieves
             }
         }
 
+        public int GetUserId(string username)
+        {
+            int userId = -1;
+            try
+            {
+                OpenDB();
+                string query = "SELECT id FROM users WHERE username = @username";
+                MySqlCommand command = new MySqlCommand(query, connection);
+                command.Parameters.AddWithValue("@username", username);
+
+                var result = command.ExecuteScalar();
+                if (result != null)
+                {
+                    userId = Convert.ToInt32(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                CloseDB();
+            }
+            return userId;
+        }
+
+        public void SaveIdleTimeoutSetting(int userId, int timeoutInMilliseconds)
+        {
+            try
+            {
+                OpenDB();
+                string query = "UPDATE users SET idle_timeout = @timeout WHERE id = @userId";
+                MySqlCommand cmd = new MySqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@timeout", timeoutInMilliseconds);
+                cmd.Parameters.AddWithValue("@userId", userId);
+
+                int rowsAffected = cmd.ExecuteNonQuery();
+
+               
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error saving idle timeout setting: " + ex.Message);
+            }
+            finally
+            {
+                CloseDB();
+            }
+        }
+        // Method to load the idle timeout setting for a user
+        public int LoadIdleTimeoutSetting(int userId)
+        {
+            int timeout = 60000; // Default to 1 minute if no setting found
+            try
+            {
+                OpenDB();
+                string query = "SELECT idle_timeout FROM users WHERE id = @userId";
+                MySqlCommand cmd = new MySqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@userId", userId);
+                object result = cmd.ExecuteScalar();
+                if (result != null)
+                {
+                    timeout = Convert.ToInt32(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error loading idle timeout setting: " + ex.Message);
+            }
+            finally
+            {
+                CloseDB();
+            }
+            return timeout;
+        }
+        public void SaveIdleTimeout(int userId, int idleTimeLimit)
+        {
+            try
+            {
+                connection.Open();
+                string query = "UPDATE Users SET idle_timeout = @idleTimeLimit WHERE id = @userId";
+                MySqlCommand cmd = new MySqlCommand(query, connection);
+                cmd.Parameters.AddWithValue("@idleTimeLimit", idleTimeLimit);
+                cmd.Parameters.AddWithValue("@userId", userId);
+                cmd.ExecuteNonQuery();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+            finally
+            {
+                connection.Close();
+            }
+        }
 
     }
 }

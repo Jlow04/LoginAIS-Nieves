@@ -40,6 +40,8 @@
             this.btnstatus = new System.Windows.Forms.Button();
             this.btnadd = new System.Windows.Forms.Button();
             this.btnrole = new System.Windows.Forms.Button();
+            this.cbeditIDLE = new System.Windows.Forms.ComboBox();
+            this.lbtimeout = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.DGVusers)).BeginInit();
             this.SuspendLayout();
             // 
@@ -176,11 +178,31 @@
             this.btnrole.UseVisualStyleBackColor = true;
             this.btnrole.Click += new System.EventHandler(this.btnrole_Click);
             // 
+            // cbeditIDLE
+            // 
+            this.cbeditIDLE.FormattingEnabled = true;
+            this.cbeditIDLE.Location = new System.Drawing.Point(382, 453);
+            this.cbeditIDLE.Name = "cbeditIDLE";
+            this.cbeditIDLE.Size = new System.Drawing.Size(65, 21);
+            this.cbeditIDLE.TabIndex = 12;
+            this.cbeditIDLE.SelectedIndexChanged += new System.EventHandler(this.cbeditIDLE_SelectedIndexChanged_1);
+            // 
+            // lbtimeout
+            // 
+            this.lbtimeout.AutoSize = true;
+            this.lbtimeout.Location = new System.Drawing.Point(308, 458);
+            this.lbtimeout.Name = "lbtimeout";
+            this.lbtimeout.Size = new System.Drawing.Size(68, 13);
+            this.lbtimeout.TabIndex = 13;
+            this.lbtimeout.Text = "Idle Timeout:";
+            // 
             // AdminForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(544, 486);
+            this.Controls.Add(this.lbtimeout);
+            this.Controls.Add(this.cbeditIDLE);
             this.Controls.Add(this.btnrole);
             this.Controls.Add(this.btnadd);
             this.Controls.Add(this.btnstatus);
@@ -215,5 +237,7 @@
         private System.Windows.Forms.Button btnstatus;
         private System.Windows.Forms.Button btnadd;
         private System.Windows.Forms.Button btnrole;
+        private System.Windows.Forms.ComboBox cbeditIDLE;
+        private System.Windows.Forms.Label lbtimeout;
     }
 }

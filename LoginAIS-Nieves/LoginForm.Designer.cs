@@ -41,6 +41,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.lbcodelog = new System.Windows.Forms.Label();
             this.tbcodelog = new System.Windows.Forms.TextBox();
+            this.lbtxtfogot = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // btnLogin
@@ -163,12 +164,25 @@
             this.tbcodelog.Size = new System.Drawing.Size(100, 20);
             this.tbcodelog.TabIndex = 10;
             // 
+            // lbtxtfogot
+            // 
+            this.lbtxtfogot.AutoSize = true;
+            this.lbtxtfogot.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.lbtxtfogot.ForeColor = System.Drawing.SystemColors.Highlight;
+            this.lbtxtfogot.Location = new System.Drawing.Point(93, 272);
+            this.lbtxtfogot.Name = "lbtxtfogot";
+            this.lbtxtfogot.Size = new System.Drawing.Size(120, 13);
+            this.lbtxtfogot.TabIndex = 13;
+            this.lbtxtfogot.Text = "Forgot password/code?";
+            this.lbtxtfogot.Click += new System.EventHandler(this.lbtxtfogot_Click);
+            // 
             // LoginForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Menu;
             this.ClientSize = new System.Drawing.Size(309, 307);
+            this.Controls.Add(this.lbtxtfogot);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.lbcodelog);
             this.Controls.Add(this.tbcodelog);
@@ -205,6 +219,7 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label lbcodelog;
         private System.Windows.Forms.TextBox tbcodelog;
+        private System.Windows.Forms.Label lbtxtfogot;
     }
 }
 

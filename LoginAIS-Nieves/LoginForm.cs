@@ -80,7 +80,8 @@ namespace LoginAIS_Nieves
                 else if (role == "user")
                 {
                     MessageBox.Show("Successfully Logged in!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    HomeForm homePage = new HomeForm(username);
+                    int loggedInUserId = db.GetUserId(username); // Adjust based on your login method
+                    HomeForm homePage = new HomeForm(username, loggedInUserId);
                     homePage.Show(); // Show the HomePage form for regular users
                 }
                 this.Hide();  // Hide the login form
@@ -173,13 +174,13 @@ namespace LoginAIS_Nieves
             Application.Exit(); // Ensure the application exits when the form is closed
         }
 
-      
-
-       
-
-
-       
-        
+        private void lbtxtfogot_Click(object sender, EventArgs e)
+        {
+            //msgbox forgot password contact admin. email address: ExampleAdmin@gmail.com
+            MessageBox.Show("Please contact the admin to recover your account/password/code. Email address: ExampleAdmin@gmail.com", "Account Recovery", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            Clipboard.SetText("ExampleAdmin@gmail.com");
+            MessageBox.Show("Email Address Copied!", "Copy Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
     }
 }
 

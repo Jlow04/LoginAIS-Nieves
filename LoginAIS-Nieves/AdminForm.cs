@@ -18,7 +18,7 @@ namespace LoginAIS_Nieves
         DataTable userTable; // Store the data retrieved from the database
         private string loggedInUsername;
 
-
+        private int selectedUserId; // Store the selected user ID
 
 
         public AdminForm(string username)
@@ -26,6 +26,8 @@ namespace LoginAIS_Nieves
             InitializeComponent();
             loggedInUsername = username;
             LoadData(); // Load data when the form is initialized
+            cbeditIDLE.SelectedIndexChanged += cbeditIDLE_SelectedIndexChanged;
+
 
             // Set placeholder text for the TextBox
             tbsearch.Text = "Search🔍";
@@ -49,8 +51,26 @@ namespace LoginAIS_Nieves
                     tbsearch.ForeColor = Color.Gray;
                 }
             };
+            
+            // Populate ComboBox with timeout values
+            LoadComboBoxValues();
 
         }
+
+        private void LoadComboBoxValues()
+        {
+            cbeditIDLE.Items.Clear();
+            cbeditIDLE.Items.Add("10 sec");
+            cbeditIDLE.Items.Add("1 min");
+            cbeditIDLE.Items.Add("5 min");
+            cbeditIDLE.Items.Add("10 min");
+            cbeditIDLE.SelectedIndex = 0; // Default value
+        }
+
+       
+
+
+
         private void LoadData()
         {
             userTable = db.GetUsers();
@@ -288,6 +308,41 @@ namespace LoginAIS_Nieves
             {
                 MessageBox.Show("Please select a user to change the role", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        private void cbeditIDLE_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+            if (DGVusers.SelectedRows.Count > 0)
+            {
+                // Get the selected user's ID
+                DataGridViewRow selectedRow = DGVusers.SelectedRows[0];
+                int userId = Convert.ToInt32(selectedRow.Cells["id"].Value);
+
+                // Get the selected idle timeout value
+                string selected = cbeditIDLE.SelectedItem.ToString();
+                int idleTimeLimit = 0;
+
+                // Convert the selected value to milliseconds
+                switch (selected)
+                {
+                    case "10 sec": idleTimeLimit = 10000; break;
+                    case "1 min": idleTimeLimit = 60000; break;
+                    case "5 min": idleTimeLimit = 300000; break;
+                    case "10 min": idleTimeLimit = 600000; break;
+                    default: break;
+                }
+
+                // Save the new idle timeout value to the database
+                db.SaveIdleTimeout(userId, idleTimeLimit);
+                //logaction
+                db.LogAction(loggedInUsername, "Change Idle Timeout", $"User '{selectedRow.Cells["username"].Value.ToString()}' idle timeout changed to {selected}.");
+
+            }
+            
+            LoadData();
+        } 
+        private void cbeditIDLE_SelectedIndexChanged(object sender, EventArgs e)
+        {    
         }
     }
 }
