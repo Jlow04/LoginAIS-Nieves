@@ -66,10 +66,13 @@ Here is a detailed README file for your **LoginAIS-Nieves** project:
      - `MySqlBackup.NET`
    - If any packages are missing, right-click the solution in Solution Explorer and click **Restore NuGet Packages**.
 
-5. **Run the Project:**
+5. **Edit the path file in adminform:**
+   - private string backupDirectory = @"example: C:\Users\jelo\Desktop\DBBackups";
+
+6. **Run the Project:**
    - Start the application and enjoy!
 
-6. **Debugging:**
+7. **Debugging:**
    - If there are errors in the code, use **GPT** to assist with troubleshooting.
 
 ---
