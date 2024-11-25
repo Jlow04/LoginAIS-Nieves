@@ -27,5 +27,6 @@ CREATE TABLE action_logs (
     timestamp DATETIME NOT NULL
 );
 
-
+ALTER TABLE users
+ADD COLUMN idle_timeout INT DEFAULT 60000;
 
