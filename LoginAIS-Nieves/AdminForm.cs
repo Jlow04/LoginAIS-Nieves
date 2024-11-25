@@ -1,9 +1,12 @@
-﻿using System;
+﻿using MySql.Data.MySqlClient;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -17,16 +20,30 @@ namespace LoginAIS_Nieves
         dbconnect db = new dbconnect(); // Initialize the dbconnect object
         DataTable userTable; // Store the data retrieved from the database
         private string loggedInUsername;
-
         private int selectedUserId; // Store the selected user ID
 
+        private Timer idleTimer; // Timer to track inactivity
+        private int idleTimeLimit; // In milliseconds
+        private DateTime lastActivityTime; // Track the last activity time
 
+        // Fixed path for storing backups
+        private string backupDirectory = @"C:\Users\hp\Desktop\DBBackups";
         public AdminForm(string username)
         {
             InitializeComponent();
             loggedInUsername = username;
             LoadData(); // Load data when the form is initialized
-            cbeditIDLE.SelectedIndexChanged += cbeditIDLE_SelectedIndexChanged;
+
+            // Create backup directory if it doesn't exist
+            if (!Directory.Exists(backupDirectory))
+            {
+                Directory.CreateDirectory(backupDirectory);
+            }
+
+            LoadBackupFiles();
+
+            // Initialize idle timeout settings
+            InitializeIdleTimeout();
 
 
             // Set placeholder text for the TextBox
@@ -57,6 +74,79 @@ namespace LoginAIS_Nieves
 
         }
 
+        private void InitializeIdleTimeout()
+        {
+            // Set default idle time limit based on ComboBox selection
+            UpdateIdleTimeLimit();
+
+            // Create and configure the idle timer
+            idleTimer = new Timer();
+            idleTimer.Interval = 1000; // Check every second
+            idleTimer.Tick += IdleTimer_Tick;
+            idleTimer.Start();
+
+            // Track user activity through global events
+            this.MouseMove += ResetIdleTimer;
+            this.KeyPress += ResetIdleTimer;
+
+            // Record the initial last activity time
+            lastActivityTime = DateTime.Now;
+        }
+
+        private void UpdateIdleTimeLimit()
+        {
+            try
+            {
+                // Fetch idle timeout value for the logged-in admin from the database
+                int timeoutFromDb = db.GetIdleTimeoutForUser(loggedInUsername);
+
+                // Validate the value from the database
+                if (timeoutFromDb > 0)
+                {
+                    idleTimeLimit = timeoutFromDb; // Set the value from the database
+                }
+                else
+                {
+                    idleTimeLimit = 60000; // Default to 1 minute if invalid value retrieved
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to fetch idle timeout from the database: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                idleTimeLimit = 60000; // Fallback to default value
+            }
+        }
+
+        private void IdleTimer_Tick(object sender, EventArgs e)
+        {
+            if ((DateTime.Now - lastActivityTime).TotalMilliseconds > idleTimeLimit)
+            {
+                // Perform auto-logout
+                idleTimer.Stop();
+                AutoLogout();
+            }
+        }
+
+        private void ResetIdleTimer(object sender, EventArgs e)
+        {
+            lastActivityTime = DateTime.Now;
+        }
+
+        private void AutoLogout()
+        {
+            idleTimer.Stop();
+            // Log the auto-logout action
+            db.LogAction(loggedInUsername, "Auto Logout", "User was logged out due to inactivity.");
+
+            MessageBox.Show("You have been logged out due to inactivity.", "Auto Logout", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            // Navigate back to the login form
+            LoginForm loginForm = new LoginForm();
+            this.Close();
+            loginForm.Show();
+        }
+
+        
         private void LoadComboBoxValues()
         {
             cbeditIDLE.Items.Clear();
@@ -66,10 +156,6 @@ namespace LoginAIS_Nieves
             cbeditIDLE.Items.Add("10 min");
             cbeditIDLE.SelectedIndex = 0; // Default value
         }
-
-       
-
-
 
         private void LoadData()
         {
@@ -175,6 +261,7 @@ namespace LoginAIS_Nieves
 
         private void button1_Click(object sender, EventArgs e)
         {
+            idleTimer.Stop();
             LoginForm loginF = new LoginForm();
             this.Close();
             loginF.ShowDialog();
@@ -341,8 +428,94 @@ namespace LoginAIS_Nieves
             
             LoadData();
         } 
-        private void cbeditIDLE_SelectedIndexChanged(object sender, EventArgs e)
-        {    
+    
+        private void LoadBackupFiles()
+        {
+            cbBackupFiles.Items.Clear();
+            string[] files = Directory.GetFiles(backupDirectory, "*.sql");
+            foreach (string file in files)
+            {
+                cbBackupFiles.Items.Add(Path.GetFileName(file));
+            }
+
+            btnRestore.Enabled = cbBackupFiles.Items.Count > 0;
+        }
+
+        private void btnBackup_Click_1(object sender, EventArgs e)
+        {
+            try
+            {
+                string backupFile = Path.Combine(backupDirectory, $"Backup_{DateTime.Now:yyyyMMdd_HHmmss}.sql");
+
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    db.OpenDBBR();
+                    cmd.Connection = db.connection;
+                    
+
+                    using (MySqlBackup mb = new MySqlBackup(cmd))
+                    {
+                        mb.ExportToFile(backupFile);
+                    }
+
+                    db.CloseDBBR();
+                    MessageBox.Show($"Backup successful! File: {backupFile}", "Backup Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadBackupFiles();
+                    //logaction
+                    db.LogAction(loggedInUsername, "Backup", $"Database backup created: {backupFile}");
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Backup failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //logaction
+                db.LogAction(loggedInUsername, "Backup", $"Database backup failed: {ex.Message}");
+            }
+        }
+
+  
+
+        private void btnRestore_Click_1(object sender, EventArgs e)
+        {
+            if (cbBackupFiles.SelectedItem == null)
+            {
+                MessageBox.Show("Please select a backup file to restore.", "No Backup Selected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string selectedBackup = Path.Combine(backupDirectory, cbBackupFiles.SelectedItem.ToString());
+
+            try
+            {
+                using (MySqlCommand cmd = new MySqlCommand())
+                {
+                    db.OpenDBBR();
+                    cmd.Connection = db.connection;
+                    
+                    using (MySqlBackup mb = new MySqlBackup(cmd))
+                    {
+                        mb.ImportFromFile(selectedBackup);
+                    }
+
+                    db.CloseDBBR();
+                    MessageBox.Show($"Restore successful from file: {selectedBackup}", "Restore Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadData();
+                    //logaction
+                    db.LogAction(loggedInUsername, "Restore", $"Database restored from file: {selectedBackup}");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Restore failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                //logaction
+                db.LogAction(loggedInUsername, "Restore", $"Database restore failed: {ex.Message}");
+            }
+
+        
+
+
         }
     }
 }

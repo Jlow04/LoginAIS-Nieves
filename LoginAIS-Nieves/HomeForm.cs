@@ -87,11 +87,11 @@ namespace LoginAIS_Nieves
 
             // Code to log out user and redirect to login form
             LoginForm loginForm = new LoginForm();
-            loginForm.Show();
             this.Close();
+            loginForm.Show();
+            
             //logaction
             db.LogAction(username, "Auto Logout", $"User '{username}' was automatically logged out due to inactivity.");
-
         }
 
         private void MainForm_MouseMove(object sender, MouseEventArgs e)
@@ -136,10 +136,9 @@ namespace LoginAIS_Nieves
 
         }
 
-       
-
         private void btnlogout_Click(object sender, EventArgs e)
         {
+            idleTimer.Stop();
             if (Clipboard.GetText() != newAccessCode)
             {
                 MessageBox.Show("Please copy the new access code before logging out.", "Copy Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -149,8 +148,9 @@ namespace LoginAIS_Nieves
                 // Log the action
                 db.LogAction(username, "Logout", $"User '{username}' logged out.");
                 LoginForm loginForm = new LoginForm();
-                loginForm.Show();
                 this.Close();
+                loginForm.Show();
+
             }
         }
 
@@ -167,7 +167,8 @@ namespace LoginAIS_Nieves
 
         private void btnnewcode_Click(object sender, EventArgs e)
         {
-
+            
         }
+
     }
 }

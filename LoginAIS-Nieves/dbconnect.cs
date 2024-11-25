@@ -36,6 +36,22 @@ namespace LoginAIS_Nieves
             dataTable = new DataTable();
         }
 
+
+        public void OpenDBBR()
+        {
+            string connectionString = "Server=localhost;Database=loginDB;User=root;Password=root;";
+            connection = new MySqlConnection(connectionString);
+            connection.Open();
+        }
+
+        public void CloseDBBR()
+        {
+            if (connection != null && connection.State == ConnectionState.Open)
+            {
+                connection.Close();
+            }
+        }
+
         public void OpenDB()
         {
             try
@@ -284,7 +300,7 @@ namespace LoginAIS_Nieves
 
                 int rowsAffected = cmd.ExecuteNonQuery();
 
-               
+
 
             }
             catch (Exception ex)
@@ -343,5 +359,32 @@ namespace LoginAIS_Nieves
             }
         }
 
+        public int GetIdleTimeoutForUser(string username)
+        {
+            int timeout = 0;
+
+            try
+            {
+                using (MySqlCommand cmd = new MySqlCommand("SELECT idle_timeout FROM users WHERE username = @username", connection))
+                {
+                    cmd.Parameters.AddWithValue("@username", username);
+                    connection.Open();
+
+                    object result = cmd.ExecuteScalar();
+                    if (result != null && int.TryParse(result.ToString(), out int dbTimeout))
+                    {
+                        timeout = dbTimeout; // Parse the timeout value
+                    }
+
+                    connection.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error retrieving idle timeout for user: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+
+            return timeout;
+        }
     }
 }

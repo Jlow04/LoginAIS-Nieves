@@ -42,6 +42,10 @@
             this.btnrole = new System.Windows.Forms.Button();
             this.cbeditIDLE = new System.Windows.Forms.ComboBox();
             this.lbtimeout = new System.Windows.Forms.Label();
+            this.btnBackup = new System.Windows.Forms.Button();
+            this.cbBackupFiles = new System.Windows.Forms.ComboBox();
+            this.btnRestore = new System.Windows.Forms.Button();
+            this.lbbackupandrestore = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.DGVusers)).BeginInit();
             this.SuspendLayout();
             // 
@@ -196,11 +200,53 @@
             this.lbtimeout.TabIndex = 13;
             this.lbtimeout.Text = "Idle Timeout:";
             // 
+            // btnBackup
+            // 
+            this.btnBackup.Location = new System.Drawing.Point(33, 508);
+            this.btnBackup.Name = "btnBackup";
+            this.btnBackup.Size = new System.Drawing.Size(56, 23);
+            this.btnBackup.TabIndex = 14;
+            this.btnBackup.Text = "Backup";
+            this.btnBackup.UseVisualStyleBackColor = true;
+            this.btnBackup.Click += new System.EventHandler(this.btnBackup_Click_1);
+            // 
+            // cbBackupFiles
+            // 
+            this.cbBackupFiles.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cbBackupFiles.FormattingEnabled = true;
+            this.cbBackupFiles.Location = new System.Drawing.Point(95, 510);
+            this.cbBackupFiles.Name = "cbBackupFiles";
+            this.cbBackupFiles.Size = new System.Drawing.Size(121, 21);
+            this.cbBackupFiles.TabIndex = 15;
+            // 
+            // btnRestore
+            // 
+            this.btnRestore.Location = new System.Drawing.Point(222, 508);
+            this.btnRestore.Name = "btnRestore";
+            this.btnRestore.Size = new System.Drawing.Size(53, 23);
+            this.btnRestore.TabIndex = 16;
+            this.btnRestore.Text = "Restore";
+            this.btnRestore.UseVisualStyleBackColor = true;
+            this.btnRestore.Click += new System.EventHandler(this.btnRestore_Click_1);
+            // 
+            // lbbackupandrestore
+            // 
+            this.lbbackupandrestore.AutoSize = true;
+            this.lbbackupandrestore.Location = new System.Drawing.Point(92, 494);
+            this.lbbackupandrestore.Name = "lbbackupandrestore";
+            this.lbbackupandrestore.Size = new System.Drawing.Size(88, 13);
+            this.lbbackupandrestore.TabIndex = 17;
+            this.lbbackupandrestore.Text = "Previous Backup";
+            // 
             // AdminForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(544, 486);
+            this.ClientSize = new System.Drawing.Size(544, 567);
+            this.Controls.Add(this.lbbackupandrestore);
+            this.Controls.Add(this.btnRestore);
+            this.Controls.Add(this.cbBackupFiles);
+            this.Controls.Add(this.btnBackup);
             this.Controls.Add(this.lbtimeout);
             this.Controls.Add(this.cbeditIDLE);
             this.Controls.Add(this.btnrole);
@@ -239,5 +285,9 @@
         private System.Windows.Forms.Button btnrole;
         private System.Windows.Forms.ComboBox cbeditIDLE;
         private System.Windows.Forms.Label lbtimeout;
+        private System.Windows.Forms.Button btnBackup;
+        private System.Windows.Forms.ComboBox cbBackupFiles;
+        private System.Windows.Forms.Button btnRestore;
+        private System.Windows.Forms.Label lbbackupandrestore;
     }
 }
