@@ -46,7 +46,12 @@
             this.cbBackupFiles = new System.Windows.Forms.ComboBox();
             this.btnRestore = new System.Windows.Forms.Button();
             this.lbbackupandrestore = new System.Windows.Forms.Label();
+            this.btnaudits = new System.Windows.Forms.Button();
+            this.panellogs = new System.Windows.Forms.Panel();
+            this.dgvlogs = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.DGVusers)).BeginInit();
+            this.panellogs.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvlogs)).BeginInit();
             this.SuspendLayout();
             // 
             // DGVusers
@@ -61,7 +66,7 @@
             this.DGVusers.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.DGVusers.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.DGVusers.EnableHeadersVisualStyles = false;
-            this.DGVusers.Location = new System.Drawing.Point(21, 50);
+            this.DGVusers.Location = new System.Drawing.Point(13, 38);
             this.DGVusers.MultiSelect = false;
             this.DGVusers.Name = "DGVusers";
             this.DGVusers.ReadOnly = true;
@@ -72,7 +77,7 @@
             this.DGVusers.ShowCellToolTips = false;
             this.DGVusers.ShowEditingIcon = false;
             this.DGVusers.ShowRowErrors = false;
-            this.DGVusers.Size = new System.Drawing.Size(502, 350);
+            this.DGVusers.Size = new System.Drawing.Size(510, 362);
             this.DGVusers.TabIndex = 0;
             // 
             // btrefresh
@@ -238,11 +243,57 @@
             this.lbbackupandrestore.TabIndex = 17;
             this.lbbackupandrestore.Text = "Previous Backup";
             // 
+            // btnaudits
+            // 
+            this.btnaudits.Location = new System.Drawing.Point(454, 407);
+            this.btnaudits.Name = "btnaudits";
+            this.btnaudits.Size = new System.Drawing.Size(56, 23);
+            this.btnaudits.TabIndex = 18;
+            this.btnaudits.Text = "Logs";
+            this.btnaudits.UseVisualStyleBackColor = true;
+            this.btnaudits.Click += new System.EventHandler(this.btnaudits_Click);
+            // 
+            // panellogs
+            // 
+            this.panellogs.Controls.Add(this.dgvlogs);
+            this.panellogs.Location = new System.Drawing.Point(13, 37);
+            this.panellogs.Name = "panellogs";
+            this.panellogs.Size = new System.Drawing.Size(510, 364);
+            this.panellogs.TabIndex = 19;
+            // 
+            // dgvlogs
+            // 
+            this.dgvlogs.AllowUserToAddRows = false;
+            this.dgvlogs.AllowUserToDeleteRows = false;
+            this.dgvlogs.AllowUserToResizeColumns = false;
+            this.dgvlogs.AllowUserToResizeRows = false;
+            this.dgvlogs.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.dgvlogs.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
+            this.dgvlogs.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvlogs.Cursor = System.Windows.Forms.Cursors.Arrow;
+            this.dgvlogs.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
+            this.dgvlogs.EnableHeadersVisualStyles = false;
+            this.dgvlogs.Location = new System.Drawing.Point(64, 1);
+            this.dgvlogs.MultiSelect = false;
+            this.dgvlogs.Name = "dgvlogs";
+            this.dgvlogs.ReadOnly = true;
+            this.dgvlogs.RowHeadersVisible = false;
+            this.dgvlogs.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
+            this.dgvlogs.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dgvlogs.ShowCellErrors = false;
+            this.dgvlogs.ShowCellToolTips = false;
+            this.dgvlogs.ShowEditingIcon = false;
+            this.dgvlogs.ShowRowErrors = false;
+            this.dgvlogs.Size = new System.Drawing.Size(379, 360);
+            this.dgvlogs.TabIndex = 1;
+            // 
             // AdminForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(544, 567);
+            this.BackColor = System.Drawing.Color.LightBlue;
+            this.ClientSize = new System.Drawing.Size(540, 567);
+            this.Controls.Add(this.btnaudits);
             this.Controls.Add(this.lbbackupandrestore);
             this.Controls.Add(this.btnRestore);
             this.Controls.Add(this.cbBackupFiles);
@@ -260,10 +311,13 @@
             this.Controls.Add(this.btedit);
             this.Controls.Add(this.btdelete);
             this.Controls.Add(this.btrefresh);
+            this.Controls.Add(this.panellogs);
             this.Controls.Add(this.DGVusers);
             this.Name = "AdminForm";
             this.Text = "AdminForm";
             ((System.ComponentModel.ISupportInitialize)(this.DGVusers)).EndInit();
+            this.panellogs.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dgvlogs)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -289,5 +343,8 @@
         private System.Windows.Forms.ComboBox cbBackupFiles;
         private System.Windows.Forms.Button btnRestore;
         private System.Windows.Forms.Label lbbackupandrestore;
+        private System.Windows.Forms.Button btnaudits;
+        private System.Windows.Forms.Panel panellogs;
+        private System.Windows.Forms.DataGridView dgvlogs;
     }
 }

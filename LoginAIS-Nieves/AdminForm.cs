@@ -17,24 +17,25 @@ namespace LoginAIS_Nieves
     public partial class AdminForm : Form
     {
         
-        dbconnect db = new dbconnect(); // Initialize the dbconnect object
-        DataTable userTable; // Store the data retrieved from the database
+        dbconnect db = new dbconnect();
+        DataTable userTable;
+        DataTable logsTable;
         private string loggedInUsername;
-        private int selectedUserId; // Store the selected user ID
+        private int selectedUserId; 
 
-        private Timer idleTimer; // Timer to track inactivity
-        private int idleTimeLimit; // In milliseconds
-        private DateTime lastActivityTime; // Track the last activity time
+        private Timer idleTimer;
+        private int idleTimeLimit;
+        private DateTime lastActivityTime; 
 
-        // Fixed path for storing backups
+        //pathfile for storing backups
         private string backupDirectory = @"C:\Users\hp\Desktop\DBBackups";
         public AdminForm(string username)
         {
             InitializeComponent();
             loggedInUsername = username;
-            LoadData(); // Load data when the form is initialized
+            LoadData();
+            panellogs.Visible = false;
 
-            // Create backup directory if it doesn't exist
             if (!Directory.Exists(backupDirectory))
             {
                 Directory.CreateDirectory(backupDirectory);
@@ -42,15 +43,15 @@ namespace LoginAIS_Nieves
 
             LoadBackupFiles();
 
-            // Initialize idle timeout settings
+            LoadComboBoxValues();
             InitializeIdleTimeout();
 
 
-            // Set placeholder text for the TextBox
+            
             tbsearch.Text = "Search🔍";
             tbsearch.ForeColor = Color.Gray;
 
-            // Handle the Enter and Leave events to manage the placeholder text
+            
             tbsearch.Enter += (s, e) =>
             {
                 if (tbsearch.Text == "Search🔍")
@@ -69,27 +70,28 @@ namespace LoginAIS_Nieves
                 }
             };
             
-            // Populate ComboBox with timeout values
-            LoadComboBoxValues();
+            
+            
 
         }
 
         private void InitializeIdleTimeout()
         {
-            // Set default idle time limit based on ComboBox selection
+            
             UpdateIdleTimeLimit();
 
-            // Create and configure the idle timer
+            
             idleTimer = new Timer();
-            idleTimer.Interval = 1000; // Check every second
+            idleTimer.Interval = 1000; 
             idleTimer.Tick += IdleTimer_Tick;
             idleTimer.Start();
 
-            // Track user activity through global events
+            
             this.MouseMove += ResetIdleTimer;
             this.KeyPress += ResetIdleTimer;
+            this.Click += ResetIdleTimer;
+            
 
-            // Record the initial last activity time
             lastActivityTime = DateTime.Now;
         }
 
@@ -97,23 +99,23 @@ namespace LoginAIS_Nieves
         {
             try
             {
-                // Fetch idle timeout value for the logged-in admin from the database
+                
                 int timeoutFromDb = db.GetIdleTimeoutForUser(loggedInUsername);
 
-                // Validate the value from the database
+                
                 if (timeoutFromDb > 0)
                 {
-                    idleTimeLimit = timeoutFromDb; // Set the value from the database
+                    idleTimeLimit = timeoutFromDb; 
                 }
                 else
                 {
-                    idleTimeLimit = 60000; // Default to 1 minute if invalid value retrieved
+                    idleTimeLimit = 600000; 
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to fetch idle timeout from the database: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                idleTimeLimit = 60000; // Fallback to default value
+                idleTimeLimit = 600000;
             }
         }
 
@@ -121,7 +123,7 @@ namespace LoginAIS_Nieves
         {
             if ((DateTime.Now - lastActivityTime).TotalMilliseconds > idleTimeLimit)
             {
-                // Perform auto-logout
+                
                 idleTimer.Stop();
                 AutoLogout();
             }
@@ -135,12 +137,12 @@ namespace LoginAIS_Nieves
         private void AutoLogout()
         {
             idleTimer.Stop();
-            // Log the auto-logout action
+            
             db.LogAction(loggedInUsername, "Auto Logout", "User was logged out due to inactivity.");
 
             MessageBox.Show("You have been logged out due to inactivity.", "Auto Logout", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            // Navigate back to the login form
+            
             LoginForm loginForm = new LoginForm();
             this.Close();
             loginForm.Show();
@@ -154,14 +156,17 @@ namespace LoginAIS_Nieves
             cbeditIDLE.Items.Add("1 min");
             cbeditIDLE.Items.Add("5 min");
             cbeditIDLE.Items.Add("10 min");
-            cbeditIDLE.SelectedIndex = 0; // Default value
+            cbeditIDLE.SelectedIndex = 0; 
         }
 
         private void LoadData()
         {
             userTable = db.GetUsers();
             DGVusers.DataSource = userTable;
-            // Make sure the "status" column exists in your DataTable
+
+            logsTable = db.Getlogs();
+            dgvlogs.DataSource = logsTable;
+
             if (DGVusers.Columns["status"] != null)
             {
                 DGVusers.Columns["status"].HeaderText = "Status";
@@ -174,7 +179,7 @@ namespace LoginAIS_Nieves
 
         private void btrefresh_Click(object sender, EventArgs e)
         {
-            LoadData(); // Refresh the data grid view
+            LoadData();
             
         }
 
@@ -186,13 +191,13 @@ namespace LoginAIS_Nieves
                 int id = Convert.ToInt32(selectedRow.Cells["id"].Value);
                 string username = selectedRow.Cells["username"].Value.ToString();
 
-                // Confirm delete
+                
                 var result = MessageBox.Show("Are you sure you want to delete this user?", "Confirm Delete", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
                     db.DeleteUser(id);
-                    LoadData(); // Reload data after delete
-                                // Log the delete action
+                    LoadData(); 
+                                
                     db.LogAction(loggedInUsername, "Delete", $"User '{username}' deleted.");
                 }
             }
@@ -206,24 +211,26 @@ namespace LoginAIS_Nieves
 
         private void btedit_Click(object sender, EventArgs e)
         {
+            idleTimer.Stop();
+
             if (DGVusers.SelectedRows.Count > 0)
             {
-                // Get selected user details
+                
                 DataGridViewRow selectedRow = DGVusers.SelectedRows[0];
                 int id = Convert.ToInt32(selectedRow.Cells["id"].Value);
                 string username = selectedRow.Cells["username"].Value.ToString();
                 string currentPassword = selectedRow.Cells["password"].Value.ToString();
 
-                // Open the EditUserForm
+               
                 using (var editForm = new EditUserForm(id, username, currentPassword))
                 {
-                    editForm.LoggedInUsername = loggedInUsername; // Pass the logged-in username
+                    editForm.LoggedInUsername = loggedInUsername; 
                     if (editForm.ShowDialog() == DialogResult.OK)
                     {
-                        // Update the user with new hashed password
+                       
                         db.UpdateUser(editForm.UserId, editForm.OriginalUsername, editForm.PasswordHash);
-                        LoadData(); // Reload the updated data
-                        db.LogAction(loggedInUsername, "Edit", $"User '{editForm.OriginalUsername}' edited."); // Log the action
+                        LoadData(); 
+                        db.LogAction(loggedInUsername, "Edit", $"User '{editForm.OriginalUsername}' edited."); 
                     }
                 }
             }
@@ -236,20 +243,20 @@ namespace LoginAIS_Nieves
 
         private void btresetattempt_Click(object sender, EventArgs e)
         {
-            // Check if a row is selected
+           
             if (DGVusers.SelectedRows.Count > 0)
             {
-                // Get the username of the selected user
+               
                 DataGridViewRow selectedRow = DGVusers.SelectedRows[0];
                 string username = selectedRow.Cells["username"].Value.ToString();
 
-                // Reset login attempts and lockout status in the database
+                
                 db.UpdateLoginAttempts(username, 0);
 
-                // Inform the user
+               
                 MessageBox.Show("Login attempts for the user have been reset.", "Reset Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                // Refresh DataGridView
+                
                 LoadData();
                 db.LogAction(loggedInUsername, "Reset Attempts", $"Login attempts reset for user '{username}'."); // Log the action
             }
@@ -270,7 +277,8 @@ namespace LoginAIS_Nieves
 
         private void btnSearch_Click(object sender, EventArgs e)
         {
-            string searchValue = tbsearch.Text.Trim(); // Get the search value from the textbox
+            idleTimer.Stop();
+            string searchValue = tbsearch.Text.Trim();
 
             if (string.IsNullOrEmpty(searchValue))
             {
@@ -284,11 +292,11 @@ namespace LoginAIS_Nieves
             {
                 if (row.Cells["username"].Value != null && row.Cells["username"].Value.ToString().Equals(searchValue, StringComparison.OrdinalIgnoreCase))
                 {
-                    row.Selected = true;  // Highlight the entire row
-                    DGVusers.FirstDisplayedScrollingRowIndex = row.Index; // Scroll to the row if it's not visible
+                    row.Selected = true;  
+                    DGVusers.FirstDisplayedScrollingRowIndex = row.Index; 
                     userFound = true;
 
-                    // Log the successful search action
+                    
                     db.LogAction(loggedInUsername, "Search", $"Searched for user '{searchValue}' - Found.");
                     
                     break;
@@ -298,9 +306,10 @@ namespace LoginAIS_Nieves
             if (!userFound)
             {
                 MessageBox.Show("Username not found.", "Search Result", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                // Log the unsuccessful search action
+                
                 db.LogAction(loggedInUsername, "Search", $"Searched for user '{searchValue}' - Not Found.");
             }
+
         }
 
         private void btnstatus_Click(object sender, EventArgs e)
@@ -313,7 +322,7 @@ namespace LoginAIS_Nieves
                 string currentStatus = selectedRow.Cells["status"].Value.ToString();
                 string newStatus = string.Empty;
 
-                // Toggle status based on current status
+                
                 if (currentStatus == "Pending")
                 {
                     newStatus = "Active";
@@ -327,14 +336,14 @@ namespace LoginAIS_Nieves
                     newStatus = "Active";
                 }
 
-                // Confirm status change
+               
                 var result = MessageBox.Show($"Change status to {newStatus}?", "Confirm Status Change", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    // Update status in the database
+                    
                     db.UpdateUserStatus(id, newStatus);
-                    LoadData(); // Refresh the data grid view
-                    db.LogAction(loggedInUsername, "Change Status", $"User '{username}' status changed to {newStatus}."); // Log the action
+                    LoadData(); 
+                    db.LogAction(loggedInUsername, "Change Status", $"User '{username}' status changed to {newStatus}."); 
                 }
             }
             else
@@ -346,23 +355,21 @@ namespace LoginAIS_Nieves
 
         private void btnadd_Click(object sender, EventArgs e)
         {
-            //add new user
-
-            // Open the AddUserForm
+            idleTimer.Stop();
             using (var addForm = new adduserForm())
             {
                 if (addForm.ShowDialog() == DialogResult.OK)
                 {
-                    // Reload data to reflect the new user
+                    idleTimer.Stop();
                     LoadData();
-                    db.LogAction(loggedInUsername, "Add", $"New user '{addForm.Username}' added."); // Log the action
+                    db.LogAction(loggedInUsername, "Add", $"New user '{addForm.Username}' added."); 
                 }
             }
         }
 
         private void btnrole_Click(object sender, EventArgs e)
         {
-            // it will change role of the selected user in the dgv
+           
             if (DGVusers.SelectedRows.Count > 0)
             {
                 DataGridViewRow selectedRow = DGVusers.SelectedRows[0];
@@ -371,7 +378,7 @@ namespace LoginAIS_Nieves
                 string currentRole = selectedRow.Cells["role"].Value.ToString();
                 string newRole = string.Empty;
 
-                // Toggle role based on current role
+                
                 if (currentRole == "admin")
                 {
                     newRole = "user";
@@ -381,14 +388,14 @@ namespace LoginAIS_Nieves
                     newRole = "admin";
                 }
 
-                // Confirm role change
+               
                 var result = MessageBox.Show($"Change role to {newRole}?", "Confirm Role Change", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes)
                 {
-                    // Update role in the database
+                   
                     db.UpdateUserRole(id, newRole);
-                    LoadData(); // Refresh the data grid view
-                    db.LogAction(loggedInUsername, "Change Role", $"User '{username}' role changed to {newRole}."); // Log the action
+                    LoadData(); 
+                    db.LogAction(loggedInUsername, "Change Role", $"User '{username}' role changed to {newRole}."); 
                 }
             }
             else
@@ -401,15 +408,15 @@ namespace LoginAIS_Nieves
         {
             if (DGVusers.SelectedRows.Count > 0)
             {
-                // Get the selected user's ID
+                
                 DataGridViewRow selectedRow = DGVusers.SelectedRows[0];
                 int userId = Convert.ToInt32(selectedRow.Cells["id"].Value);
 
-                // Get the selected idle timeout value
+                
                 string selected = cbeditIDLE.SelectedItem.ToString();
                 int idleTimeLimit = 0;
 
-                // Convert the selected value to milliseconds
+                
                 switch (selected)
                 {
                     case "10 sec": idleTimeLimit = 10000; break;
@@ -419,9 +426,9 @@ namespace LoginAIS_Nieves
                     default: break;
                 }
 
-                // Save the new idle timeout value to the database
+                
                 db.SaveIdleTimeout(userId, idleTimeLimit);
-                //logaction
+               
                 db.LogAction(loggedInUsername, "Change Idle Timeout", $"User '{selectedRow.Cells["username"].Value.ToString()}' idle timeout changed to {selected}.");
 
             }
@@ -461,7 +468,7 @@ namespace LoginAIS_Nieves
                     db.CloseDBBR();
                     MessageBox.Show($"Backup successful! File: {backupFile}", "Backup Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LoadBackupFiles();
-                    //logaction
+                    
                     db.LogAction(loggedInUsername, "Backup", $"Database backup created: {backupFile}");
 
 
@@ -470,7 +477,7 @@ namespace LoginAIS_Nieves
             catch (Exception ex)
             {
                 MessageBox.Show($"Backup failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //logaction
+              
                 db.LogAction(loggedInUsername, "Backup", $"Database backup failed: {ex.Message}");
             }
         }
@@ -502,18 +509,33 @@ namespace LoginAIS_Nieves
                     db.CloseDBBR();
                     MessageBox.Show($"Restore successful from file: {selectedBackup}", "Restore Complete", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     LoadData();
-                    //logaction
+                    
                     db.LogAction(loggedInUsername, "Restore", $"Database restored from file: {selectedBackup}");
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Restore failed: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //logaction
+               
                 db.LogAction(loggedInUsername, "Restore", $"Database restore failed: {ex.Message}");
             }
 
         
+
+
+        }
+
+        private void btnaudits_Click(object sender, EventArgs e)
+        {
+            //first click send forward the panel, second click send back the panel
+            if (panellogs.Visible == true)
+            {
+                panellogs.Visible = false;
+            }
+            else
+            {
+                panellogs.Visible = true;
+            }
 
 
         }

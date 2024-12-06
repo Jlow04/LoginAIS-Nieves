@@ -44,9 +44,9 @@
             this.lbADDFORM.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbADDFORM.Location = new System.Drawing.Point(52, 29);
             this.lbADDFORM.Name = "lbADDFORM";
-            this.lbADDFORM.Size = new System.Drawing.Size(153, 18);
+            this.lbADDFORM.Size = new System.Drawing.Size(150, 18);
             this.lbADDFORM.TabIndex = 21;
-            this.lbADDFORM.Text = "ADMIN ADD FORM";
+            this.lbADDFORM.Text = "ADMIN ADD USER";
             // 
             // lbcapslock
             // 
@@ -113,6 +113,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(253, 196);
+            this.ControlBox = false;
             this.Controls.Add(this.btncancel);
             this.Controls.Add(this.lbADDFORM);
             this.Controls.Add(this.lbcapslock);

@@ -87,6 +87,18 @@ namespace LoginAIS_Nieves
             return dt;
         }
 
+        public DataTable Getlogs()
+        {
+            OpenDB();
+            string sql = "SELECT id, username, action, details, timestamp FROM action_logs";
+            DataTable dt = new DataTable();
+            MySqlCommand cmd = new MySqlCommand(sql, connection);
+            MySqlDataAdapter adapter = new MySqlDataAdapter(cmd);
+            adapter.Fill(dt);
+            CloseDB();
+            return dt;
+        }
+
         public DataTable GetUserAttemps(string username)
         {
             DataTable dataTable = new DataTable();
@@ -315,7 +327,8 @@ namespace LoginAIS_Nieves
         // Method to load the idle timeout setting for a user
         public int LoadIdleTimeoutSetting(int userId)
         {
-            int timeout = 60000; // Default to 1 minute if no setting found
+            int timeout = 60000; // Default to never if no setting found
+
             try
             {
                 OpenDB();
@@ -362,6 +375,7 @@ namespace LoginAIS_Nieves
         public int GetIdleTimeoutForUser(string username)
         {
             int timeout = 0;
+            int dbTimeout = 600000;
 
             try
             {
@@ -371,9 +385,10 @@ namespace LoginAIS_Nieves
                     connection.Open();
 
                     object result = cmd.ExecuteScalar();
-                    if (result != null && int.TryParse(result.ToString(), out int dbTimeout))
+                    if (result != null && int.TryParse(result.ToString(), out dbTimeout))
                     {
                         timeout = dbTimeout; // Parse the timeout value
+
                     }
 
                     connection.Close();

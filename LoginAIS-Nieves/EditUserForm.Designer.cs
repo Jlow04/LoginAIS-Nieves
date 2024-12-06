@@ -95,13 +95,14 @@
             this.lblog.Name = "lblog";
             this.lblog.Size = new System.Drawing.Size(143, 18);
             this.lblog.TabIndex = 14;
-            this.lblog.Text = "ADMIN EDIT FORM";
+            this.lblog.Text = "ADMIN EDIT USER";
             // 
             // EditUserForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(182, 178);
+            this.ControlBox = false;
             this.Controls.Add(this.lblog);
             this.Controls.Add(this.lbcapslock);
             this.Controls.Add(this.lbpassE);

@@ -18,34 +18,35 @@ namespace LoginAIS_Nieves
         private string newAccessCode;
 
         private Timer idleTimer;
-        private int userId; // Set this to the logged-in user's ID
+        private int userId; 
         private int idleTimeLimit;
         private DateTime lastActivity;
 
         public HomeForm(string user, int userId)
         {
+           
             InitializeComponent();
             username = user;
             GenerateNewAccessCode();
 
-            this.userId = userId; // Set the user ID here
-            // Initialize ComboBox options
+            this.userId = userId; 
+           
             CBIDLE.Items.AddRange(new object[] { "10 sec", "1 min", "5 min", "10 min" });
             CBIDLE.SelectedIndexChanged += ComboBoxTimeout_SelectedIndexChanged;
 
 
-            // Load user-specific idle timeout setting
+            
             idleTimeLimit = db.LoadIdleTimeoutSetting(userId);
             SetComboBoxSelectionFromTimeout(idleTimeLimit);
 
-            // Set up the idle timer
+            
             idleTimer = new Timer();
-            idleTimer.Interval = 1000; // Check every second
+            idleTimer.Interval = 1000; 
             idleTimer.Tick += IdleTimer_Tick;
             ResetIdleTimer();
             idleTimer.Start();
 
-            // Track user activity
+            
             this.MouseMove += MainForm_MouseMove;
             this.KeyPress += MainForm_KeyPress;
         }
@@ -61,10 +62,10 @@ namespace LoginAIS_Nieves
                 case "10 min": idleTimeLimit = 600000; break;
             }
 
-            // Save the new setting to the database
+           
             db.SaveIdleTimeoutSetting(userId, idleTimeLimit);
             ResetIdleTimer();
-            //logaction
+            
             db.LogAction(username, "Change Idle Timeout", $"User '{username}' changed the idle timeout to {selected}.");
 
         }
@@ -85,12 +86,12 @@ namespace LoginAIS_Nieves
             Clipboard.SetText(newAccessCode);
             MessageBox.Show("New Access Code Copied!", "Copy Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-            // Code to log out user and redirect to login form
+            
             LoginForm loginForm = new LoginForm();
             this.Close();
             loginForm.Show();
             
-            //logaction
+            
             db.LogAction(username, "Auto Logout", $"User '{username}' was automatically logged out due to inactivity.");
         }
 
@@ -126,13 +127,13 @@ namespace LoginAIS_Nieves
         {
             newAccessCode = GenerateAccessCode();
             tbcode.Text = newAccessCode;
-            db.UpdateAccessCode(username, newAccessCode); // Update in database
+            db.UpdateAccessCode(username, newAccessCode); 
             db.LogAction(username, "Generate New Access Code", $"User '{username}' generated a new access code: {newAccessCode}.");
         }
         private string GenerateAccessCode()
         {
             Random rnd = new Random();
-            return rnd.Next(1000, 9999).ToString(); // Generates a 4-digit random number
+            return rnd.Next(1000, 9999).ToString(); 
 
         }
 
@@ -145,7 +146,7 @@ namespace LoginAIS_Nieves
             }
             else
             {
-                // Log the action
+                
                 db.LogAction(username, "Logout", $"User '{username}' logged out.");
                 LoginForm loginForm = new LoginForm();
                 this.Close();
@@ -170,5 +171,16 @@ namespace LoginAIS_Nieves
             
         }
 
+        private void btnMAIN_Click(object sender, EventArgs e)
+        {
+            panelMAIN.Show();
+            panelCODE.Hide();
+        }
+
+        private void btnCODE_Click(object sender, EventArgs e)
+        {
+            panelCODE.Show();
+            panelMAIN.Hide();
+        }
     }
 }
