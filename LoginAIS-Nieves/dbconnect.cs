@@ -74,7 +74,7 @@ namespace LoginAIS_Nieves
             }
         }
 
-        // Method to fetch all users for displaying in DataGridView
+        
         public DataTable GetUsers()
         {
             OpenDB();
@@ -159,7 +159,7 @@ namespace LoginAIS_Nieves
 
         }
 
-        // Method to update user information (for Admin Form)
+        
         public void UpdateUser(int id, string username, string password)
         {
             OpenDB();
@@ -174,20 +174,20 @@ namespace LoginAIS_Nieves
 
 
 
-        // Method to update the access code
+        
         public void UpdateAccessCode(string username, string accessCode)
         {
             try
             {
-                OpenDB();  // Open the database connection
+                OpenDB(); 
 
                 string query = "UPDATE users SET access_code = @accesscode WHERE username = @username";
                 MySqlCommand cmd = new MySqlCommand(query, connection);
                 cmd.Parameters.AddWithValue("@username", username);
                 cmd.Parameters.AddWithValue("@accesscode", accessCode);
 
-                cmd.ExecuteNonQuery();  // Execute the query
-                CloseDB();  // Close the database connection
+                cmd.ExecuteNonQuery();  
+                CloseDB();  
             }
             catch (MySqlException ex)
             {
@@ -196,7 +196,7 @@ namespace LoginAIS_Nieves
         }
 
 
-        // Method to delete a user from the database (for Admin Form)
+        
         public void DeleteUser(int id)
         {
             OpenDB();
@@ -228,7 +228,7 @@ namespace LoginAIS_Nieves
             }
         }
 
-        //  db.UpdateUserRole(id, newRole);
+        
         public void UpdateUserRole(int id, string newRole)
         {
             try
@@ -324,10 +324,10 @@ namespace LoginAIS_Nieves
                 CloseDB();
             }
         }
-        // Method to load the idle timeout setting for a user
+       
         public int LoadIdleTimeoutSetting(int userId)
         {
-            int timeout = 60000; // Default to never if no setting found
+            int timeout = 60000; 
 
             try
             {
@@ -387,7 +387,7 @@ namespace LoginAIS_Nieves
                     object result = cmd.ExecuteScalar();
                     if (result != null && int.TryParse(result.ToString(), out dbTimeout))
                     {
-                        timeout = dbTimeout; // Parse the timeout value
+                        timeout = dbTimeout; 
 
                     }
 

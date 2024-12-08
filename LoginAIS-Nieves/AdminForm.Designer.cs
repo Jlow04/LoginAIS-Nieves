@@ -49,6 +49,7 @@
             this.btnaudits = new System.Windows.Forms.Button();
             this.panellogs = new System.Windows.Forms.Panel();
             this.dgvlogs = new System.Windows.Forms.DataGridView();
+            this.btnlogback = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.DGVusers)).BeginInit();
             this.panellogs.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvlogs)).BeginInit();
@@ -255,6 +256,7 @@
             // 
             // panellogs
             // 
+            this.panellogs.Controls.Add(this.btnlogback);
             this.panellogs.Controls.Add(this.dgvlogs);
             this.panellogs.Location = new System.Drawing.Point(13, 37);
             this.panellogs.Name = "panellogs";
@@ -286,6 +288,16 @@
             this.dgvlogs.ShowRowErrors = false;
             this.dgvlogs.Size = new System.Drawing.Size(379, 360);
             this.dgvlogs.TabIndex = 1;
+            // 
+            // btnlogback
+            // 
+            this.btnlogback.Location = new System.Drawing.Point(454, 329);
+            this.btnlogback.Name = "btnlogback";
+            this.btnlogback.Size = new System.Drawing.Size(43, 23);
+            this.btnlogback.TabIndex = 2;
+            this.btnlogback.Text = "Back";
+            this.btnlogback.UseVisualStyleBackColor = true;
+            this.btnlogback.Click += new System.EventHandler(this.btnlogback_Click);
             // 
             // AdminForm
             // 
@@ -346,5 +358,6 @@
         private System.Windows.Forms.Button btnaudits;
         private System.Windows.Forms.Panel panellogs;
         private System.Windows.Forms.DataGridView dgvlogs;
+        private System.Windows.Forms.Button btnlogback;
     }
 }

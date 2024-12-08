@@ -36,6 +36,7 @@ namespace LoginAIS_Nieves
             LoadData();
             panellogs.Visible = false;
 
+
             if (!Directory.Exists(backupDirectory))
             {
                 Directory.CreateDirectory(backupDirectory);
@@ -46,8 +47,9 @@ namespace LoginAIS_Nieves
             LoadComboBoxValues();
             InitializeIdleTimeout();
 
+            // Additional event to restart timer when the form regains focus
+            this.Activated += (s, e) => RestartIdleTimer();
 
-            
             tbsearch.Text = "Search🔍";
             tbsearch.ForeColor = Color.Gray;
 
@@ -75,6 +77,33 @@ namespace LoginAIS_Nieves
 
         }
 
+        // Stop the timer
+        private void StopIdleTimer()
+        {
+            if (idleTimer != null && idleTimer.Enabled)
+            {
+                idleTimer.Stop();
+            }
+        }
+
+        // Restart the timer
+        private void RestartIdleTimer()
+        {
+            if (idleTimer != null && !idleTimer.Enabled)
+            {
+                lastActivityTime = DateTime.Now; // Reset activity time
+                idleTimer.Start();
+            }
+        }
+
+        // Timer disposal when form is closed
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            StopIdleTimer();
+            idleTimer.Dispose();
+            base.OnFormClosing(e);
+        }
+
         private void InitializeIdleTimeout()
         {
             
@@ -99,31 +128,21 @@ namespace LoginAIS_Nieves
         {
             try
             {
-                
                 int timeoutFromDb = db.GetIdleTimeoutForUser(loggedInUsername);
-
-                
-                if (timeoutFromDb > 0)
-                {
-                    idleTimeLimit = timeoutFromDb; 
-                }
-                else
-                {
-                    idleTimeLimit = 600000; 
-                }
+                idleTimeLimit = timeoutFromDb > 0 ? timeoutFromDb : 600000; 
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Failed to fetch idle timeout from the database: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                idleTimeLimit = 600000;
+                idleTimeLimit = 600000; 
             }
         }
 
         private void IdleTimer_Tick(object sender, EventArgs e)
         {
-            if ((DateTime.Now - lastActivityTime).TotalMilliseconds > idleTimeLimit)
+            var elapsedMs = (DateTime.Now - lastActivityTime).TotalMilliseconds;
+            if (elapsedMs >= idleTimeLimit)
             {
-                
                 idleTimer.Stop();
                 AutoLogout();
             }
@@ -211,7 +230,7 @@ namespace LoginAIS_Nieves
 
         private void btedit_Click(object sender, EventArgs e)
         {
-            idleTimer.Stop();
+            StopIdleTimer(); 
 
             if (DGVusers.SelectedRows.Count > 0)
             {
@@ -238,6 +257,7 @@ namespace LoginAIS_Nieves
             {
                 MessageBox.Show("Please select a user to edit", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            RestartIdleTimer(); 
 
         }
 
@@ -355,7 +375,8 @@ namespace LoginAIS_Nieves
 
         private void btnadd_Click(object sender, EventArgs e)
         {
-            idleTimer.Stop();
+            StopIdleTimer(); 
+           
             using (var addForm = new adduserForm())
             {
                 if (addForm.ShowDialog() == DialogResult.OK)
@@ -364,7 +385,10 @@ namespace LoginAIS_Nieves
                     LoadData();
                     db.LogAction(loggedInUsername, "Add", $"New user '{addForm.Username}' added."); 
                 }
-            }
+            } 
+            
+            RestartIdleTimer(); 
+
         }
 
         private void btnrole_Click(object sender, EventArgs e)
@@ -408,34 +432,43 @@ namespace LoginAIS_Nieves
         {
             if (DGVusers.SelectedRows.Count > 0)
             {
-                
                 DataGridViewRow selectedRow = DGVusers.SelectedRows[0];
                 int userId = Convert.ToInt32(selectedRow.Cells["id"].Value);
 
-                
                 string selected = cbeditIDLE.SelectedItem.ToString();
-                int idleTimeLimit = 0;
+                int idleTimeLimitMs;
 
-                
                 switch (selected)
                 {
-                    case "10 sec": idleTimeLimit = 10000; break;
-                    case "1 min": idleTimeLimit = 60000; break;
-                    case "5 min": idleTimeLimit = 300000; break;
-                    case "10 min": idleTimeLimit = 600000; break;
-                    default: break;
+                    case "10 sec":
+                        idleTimeLimitMs = 10000;
+                        break;
+                    case "1 min":
+                        idleTimeLimitMs = 60000;
+                        break;
+                    case "5 min":
+                        idleTimeLimitMs = 300000;
+                        break;
+                    case "10 min":
+                        idleTimeLimitMs = 600000;
+                        break;
+                    default:
+                        idleTimeLimitMs = 600000; 
+                        break;
                 }
 
-                
-                db.SaveIdleTimeout(userId, idleTimeLimit);
-               
-                db.LogAction(loggedInUsername, "Change Idle Timeout", $"User '{selectedRow.Cells["username"].Value.ToString()}' idle timeout changed to {selected}.");
+                db.SaveIdleTimeout(userId, idleTimeLimitMs);
+                db.LogAction(loggedInUsername, "Change Idle Timeout",
+                             $"User '{selectedRow.Cells["username"].Value.ToString()}' idle timeout changed to {selected}.");
 
+                
+                this.idleTimeLimit = idleTimeLimitMs;
+                RestartIdleTimer(); 
             }
-            
+
             LoadData();
-        } 
-    
+        }
+           
         private void LoadBackupFiles()
         {
             cbBackupFiles.Items.Clear();
@@ -527,7 +560,7 @@ namespace LoginAIS_Nieves
 
         private void btnaudits_Click(object sender, EventArgs e)
         {
-            //first click send forward the panel, second click send back the panel
+            
             if (panellogs.Visible == true)
             {
                 panellogs.Visible = false;
@@ -538,6 +571,18 @@ namespace LoginAIS_Nieves
             }
 
 
+        }
+
+        private void btnlogback_Click(object sender, EventArgs e)
+        {
+            if (panellogs.Visible == true)
+            {
+                panellogs.Visible = false;
+            }
+            else
+            {
+                panellogs.Visible = true;
+            }
         }
     }
 }

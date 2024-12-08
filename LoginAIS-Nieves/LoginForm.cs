@@ -14,9 +14,9 @@ namespace LoginAIS_Nieves
     {
         dbconnect db = new dbconnect();
 
-        private const int maxAttempts = 3;  // Maximum allowed login attempts
+        private const int maxAttempts = 3;  
 
-        // Dictionary to store failed login attempts per user
+        
         private Dictionary<string, int> loginAttempts = new Dictionary<string, int>();
 
  
@@ -29,7 +29,7 @@ namespace LoginAIS_Nieves
         {
             string username = tbusername.Text;
             string password = tbpassword.Text;
-            string accessCode = tbcodelog.Text; // Access code input from user
+            string accessCode = tbcodelog.Text; 
 
             DataTable userTable = db.GetUserAttemps(username);
 
@@ -41,13 +41,13 @@ namespace LoginAIS_Nieves
             }
 
 
-            // Get login attempt
+            
             DataRow user = userTable.Rows[0];
             int loginAttempts = Convert.ToInt32(user["login_attempts"]);
             string status = user["status"].ToString();
   
 
-            // Check the user's status
+            
             if (status == "Pending")
             {
                 MessageBox.Show("Your account is pending approval by the admin.", "Account Pending", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -61,14 +61,14 @@ namespace LoginAIS_Nieves
                 return;
             }
 
-            // Authenticate the user (including access code check)
+            
             if (AuthenticateUser(username, password, accessCode))
             {
-                // Fetch the user's role from the database
+               
                 string role = user["role"].ToString();
 
-                // Successful login: Reset login attempts and lockout information
-                db.UpdateLoginAttempts(username, 0); // Reset attempts 
+                
+                db.UpdateLoginAttempts(username, 0); 
 
                 db.LogAction(username, "Login Attempt", "Successful");
 
@@ -80,11 +80,11 @@ namespace LoginAIS_Nieves
                 else if (role == "user")
                 {
                     MessageBox.Show("Successfully Logged in!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    int loggedInUserId = db.GetUserId(username); // Adjust based on your login method
+                    int loggedInUserId = db.GetUserId(username); 
                     HomeForm homePage = new HomeForm(username, loggedInUserId);
-                    homePage.Show(); // Show the HomePage form for regular users
+                    homePage.Show(); 
                 }
-                this.Hide();  // Hide the login form
+                this.Hide();  
             }
             else
             {
@@ -92,7 +92,7 @@ namespace LoginAIS_Nieves
 
                 if (loginAttempts >= maxAttempts)
                 {
-                    // Mark the account as inactive
+                    
                     db.UpdateUserStatus(Convert.ToInt32(user["id"]), "Inactive");
                     db.UpdateLoginAttempts(username, loginAttempts);
                     MessageBox.Show("Too many failed login attempts. Your account has been deactivated. Please contact the admin to regain access.", "Account Deactivated", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -101,7 +101,7 @@ namespace LoginAIS_Nieves
 
                 else
                 {
-                    // Update login attempts without deactivating the account
+                   
                     db.UpdateLoginAttempts(username, loginAttempts);
                     MessageBox.Show($"Invalid Username, Password or Access Code! {maxAttempts - loginAttempts} attempts remaining.", "Login Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
                      db.LogAction(username, "Login Attempt", "Failed - Invalid credentials");
@@ -109,24 +109,24 @@ namespace LoginAIS_Nieves
             }
         }
 
-        // Method to authenticate user with username, password, and access code
+        
         private bool AuthenticateUser(string username, string password, string accessCode)
         {
-            DataTable dt = db.Login();  // Fetch users from the database
+            DataTable dt = db.Login();  
 
             foreach (DataRow row in dt.Rows)
             {
                 string encryptedPassword = EncryptionHelper.HashPassword(password);
 
-                // Check if the username, hashed password, and access code match
+                
                 if (row["username"].ToString() == username && row["password"].ToString() == encryptedPassword && row["access_code"].ToString() == accessCode)
                 {
-                    // Successful authentication
+                    
                     return true;
                 }
             }
 
-            // If no match is found, return false
+            
             return false;
         }
 
@@ -156,27 +156,27 @@ namespace LoginAIS_Nieves
             }
             else
             {
-                lbcapslock.Text = string.Empty;  // Clear the label if CapsLock is off
+                lbcapslock.Text = string.Empty;  
             }
         }
 
         private void lbregister_Click(object sender, EventArgs e)
         {
-            // Open the RegisterForm
+           
             RegisterForm registerForm = new RegisterForm();
             this.Hide(); 
-            registerForm.ShowDialog(); // Show the register form as a dialog
+            registerForm.ShowDialog(); 
             
         }
 
         private void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            Application.Exit(); // Ensure the application exits when the form is closed
+            Application.Exit(); 
         }
 
         private void lbtxtfogot_Click(object sender, EventArgs e)
         {
-            //msgbox forgot password contact admin. email address: ExampleAdmin@gmail.com
+            
             MessageBox.Show("Please contact the admin to recover your account/password/code. Email address: ExampleAdmin@gmail.com", "Account Recovery", MessageBoxButtons.OK, MessageBoxIcon.Information);
             Clipboard.SetText("ExampleAdmin@gmail.com");
             MessageBox.Show("Email Address Copied!", "Copy Success", MessageBoxButtons.OK, MessageBoxIcon.Information);

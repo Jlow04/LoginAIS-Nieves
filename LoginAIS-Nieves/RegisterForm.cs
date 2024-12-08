@@ -26,26 +26,26 @@ namespace LoginAIS_Nieves
 
         private void btnregister_Click(object sender, EventArgs e)
         {
-            // Get the username and password from the textboxes
+           
             string username = tbusernameR.Text;
             string password = tbpasswordR.Text;
             string confirmPassword = tbconfirmpasswordR.Text;
 
-            // Validate that the fields are not empty
+            
             if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(password))
             {
                 MessageBox.Show("Please fill in all fields", "Input Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            // Check if passwords match
+            
             if (password != confirmPassword)
             {
                 MessageBox.Show("Passwords do not match", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            // Check if username already exists
+            
             if (IsUsernameTaken(username))
             {
                 MessageBox.Show("Username is already taken", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -62,7 +62,7 @@ namespace LoginAIS_Nieves
             }
 
             
-            // Register the user using the provided method
+            
             RegisterNewUser(username, password);
             
 
@@ -86,16 +86,16 @@ namespace LoginAIS_Nieves
 
         private bool IsUsernameTaken(string username)
         {
-            DataTable dt = db.Login();  // Fetch users from the database
+            DataTable dt = db.Login();  
 
             foreach (DataRow row in dt.Rows)
             {
                 if (row["username"].ToString() == username)
                 {
-                    return true;  // Username is already taken
+                    return true;  
                 }
             }
-            return false;  // Username is available
+            return false;  
         }
 
         private void RegisterNewUser(string username, string password)
@@ -104,10 +104,10 @@ namespace LoginAIS_Nieves
             {
                 db.OpenDB();
 
-                // Encrypt the password before saving
+                
                 string encryptedPassword = EncryptionHelper.HashPassword(password);
 
-                // Default role is 'user' for newly registered users
+                
                 string sql = "INSERT INTO users (username, password, role) VALUES (@username, @password, 'user')";
                 MySqlCommand cmd = new MySqlCommand(sql, db.connection);
                 cmd.Parameters.AddWithValue("@username", username);
@@ -117,9 +117,9 @@ namespace LoginAIS_Nieves
                 db.CloseDB();
 
                 MessageBox.Show("Registration successful!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                db.LogAction(username, "Register", $"User '{username}' registered successfully."); // Log successful registration
+                db.LogAction(username, "Register", $"User '{username}' registered successfully."); 
 
-                // Close the registration form and go back to the login form
+                
                 this.Hide();
                 LoginForm login = new LoginForm();
                 login.ShowDialog();
@@ -157,34 +157,34 @@ namespace LoginAIS_Nieves
             }
             else
             {
-                lbcapslockR.Text = string.Empty;  // Clear the label if CapsLock is off
+                lbcapslockR.Text = string.Empty; 
             }
         }
 
-        // Password strength checker logic
+        
         private string CheckPasswordStrength(string password)
         {
             int score = 0;
 
-            // If password is 8 characters or more
+           
             if (password.Length >= 8) score++;
 
-            // If password contains both upper and lower case characters
+            
             if (Regex.IsMatch(password, @"[a-z]") && Regex.IsMatch(password, @"[A-Z]")) score++;
 
-            // If it contains numbers
+           
             if (Regex.IsMatch(password, @"\d")) score++;
 
-            // If it contains special characters
+           
             if (Regex.IsMatch(password, @"!@#\$%\^&\*\(\)_\+\-=\[\]{};':\\|,.<>\/?" ) ) score++;
 
-            // Determine strength based on score
+            
             if (score == 3) return "Strong";
             if (score == 2) return "Medium";
             return "Weak";
         }
 
-        // Real-time password strength display
+        
         private void tbpasswordR_TextChanged(object sender, EventArgs e)
         {
             string password = tbpasswordR.Text;
@@ -192,7 +192,7 @@ namespace LoginAIS_Nieves
 
             lblPasswordStrength.Text = $"Password Strength: {strength}";
 
-            // Color feedback
+            
             if (strength == "Strong")
             {
                 lblPasswordStrength.ForeColor = System.Drawing.Color.Green;
@@ -231,14 +231,14 @@ namespace LoginAIS_Nieves
 
         private void tbpasswordR_Enter(object sender, EventArgs e)
         {
-            // Display the password strength message when the textbox is in use.
+            
             lbpasswordstr.Text = "A strong password is:At least 8 characters,\na combination of uppercase letters,\nlowercase letters, numbers, and symbols.";
             lbpasswordstr.ForeColor = System.Drawing.Color.Black;
         }
 
         private void tbpasswordR_Leave(object sender, EventArgs e)
         {
-            // Hide the message when the user leaves the textbox.
+            
             lbpasswordstr.Text = string.Empty;
         }
 

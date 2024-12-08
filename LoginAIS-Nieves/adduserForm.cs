@@ -17,8 +17,8 @@ namespace LoginAIS_Nieves
         
         dbconnect db = new dbconnect();
         AdminForm adForm = new AdminForm("user");
-        // Inside adduserForm class
-        public string Username { get; private set; }  // Expose Username as a public property
+       
+        public string Username { get; private set; } 
 
         public adduserForm()
         {
@@ -55,13 +55,13 @@ namespace LoginAIS_Nieves
             }
 
             RegisterNewUser(username, password);
-            this.DialogResult = DialogResult.OK; // Close the form and indicate success
+            this.DialogResult = DialogResult.OK; 
             this.Close();
         }
 
         private bool IsUsernameTaken(string username)
         {
-            DataTable dt = db.Login(); // Get all users
+            DataTable dt = db.Login(); 
 
             foreach (DataRow row in dt.Rows)
             {
@@ -100,19 +100,19 @@ namespace LoginAIS_Nieves
         {
             int score = 0;
 
-            // If password is 8 characters or more
+            
             if (password.Length >= 8) score++;
 
-            // If password contains both upper and lower case characters
+            
             if (Regex.IsMatch(password, @"[a-z]") && Regex.IsMatch(password, @"[A-Z]")) score++;
 
-            // If it contains numbers
+           
             if (Regex.IsMatch(password, @"\d")) score++;
 
-            // If it contains special characters
+            
             if (Regex.IsMatch(password, @"!@#\$%\^&\*\(\)_\+\-=\[\]{};':\\|,.<>\/?")) score++;
 
-            // Determine strength based on score
+            
             if (score == 3) return "Strong";
             if (score == 2) return "Medium";
             return "Weak";
