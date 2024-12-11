@@ -1,5 +1,3 @@
-Here is a detailed README file for your **LoginAIS-Nieves** project:
-
 ---
 
 # LoginAIS-Nieves
@@ -63,17 +61,20 @@ Here is a detailed README file for your **LoginAIS-Nieves** project:
 4. **Install Dependencies:**
    - Open **Manage NuGet Packages for Solution** and install:
      - `MySql.Data`
+     - `BouncyCastle.Cryptography`
      - `MySqlBackup.NET`
    - If any packages are missing, right-click the solution in Solution Explorer and click **Restore NuGet Packages**.
 
 5. **Edit the path file in adminform:**
+   - creata a folder for backups of the sql files and copy the path of that folder and paste it in the code:
    - private string backupDirectory = @"example: C:\Users\jelo\Desktop\DBBackups";
+     
 
-6. **Run the Project:**
+7. **Run the Project:**
    - Start the application and enjoy!
 
-7. **Debugging:**
-   - If there are errors in the code, use **GPT** to assist with troubleshooting.
+8. **Debugging:**
+   - If there are errors in the code, use **GPT** or **Contact the owner** to assist with troubleshooting.
 
 ---
 
